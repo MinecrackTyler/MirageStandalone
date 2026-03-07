@@ -1,3 +1,6 @@
+# Note
+This project contains just the basics, enough to get weaver to work outside of unity, and requires referencing game dlls to do this. This is currently not published correctly, so will require modification of Directory.Build.Props as needed
+
 # Mirage Standalone
 
 Mirage Standalone package is a .NET Core version of [Mirage](https://github.com/MirageNet/Mirage). Mirage Standalone allows the core parts of Mirage to be used outside of unity.
