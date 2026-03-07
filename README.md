@@ -1,5 +1,5 @@
 # Note
-This project contains just the basics, enough to get weaver to work outside of unity, and requires referencing game dlls to do this. This is currently not published correctly, so will require modification of Directory.Build.Props as needed
+This project contains just the basics, enough to get weaver to work outside of unity, and requires referencing game dlls to do this. This is currently not published correctly, so will require modification of Directory.Build.Props as needed. Also currently requires local build, I hope to eventually add an option to search directories when patching to find the needed dlls, allowing for just building an executable and then publishing that, but not yet.
 
 # Mirage Standalone
 
