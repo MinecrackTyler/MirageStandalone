@@ -1,5 +1,4 @@
 using System;
-using Mirage;
 using Mirage.Examples;
 
 namespace MirageHostExample

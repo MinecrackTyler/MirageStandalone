@@ -192,6 +192,12 @@ namespace Mirage.Weaver
         {
             if (klass.HasCustomAttribute<NetworkMessageAttribute>())
             {
+                if (klass.HasGenericParameters)
+                {
+                    logger.Error($"The [NetworkMessage] attribute cannot be applied to open generic types like '{klass.Name}'. Network messages must be concrete types.");
+                    return;
+                }
+
                 Log($"Loading message: {klass.FullName}");
                 readers.TryGetFunction(klass, null);
                 writers.TryGetFunction(klass, null);
@@ -340,13 +346,13 @@ namespace Mirage.Weaver
             customAttributeRef.ConstructorArguments.Add(new CustomAttributeArgument(module.ImportReference<RuntimeInitializeLoadType>(), RuntimeInitializeLoadType.BeforeSceneLoad));
             rwInitializer.CustomAttributes.Add(customAttributeRef);
 
-            if (IsEditorAssembly(module))
+            /*if (IsEditorAssembly(module)) <-- i cant reference InitializeOnLoadMethodAttribute for some reason, so i just commented this out
             {
                 // editor assembly,  add InitializeOnLoadMethod too.  Useful for the editor tests
                 var initializeOnLoadConstructor = typeof(InitializeOnLoadMethodAttribute).GetConstructor(new Type[0]);
                 var initializeCustomConstructorRef = new CustomAttribute(module.ImportReference(initializeOnLoadConstructor));
                 rwInitializer.CustomAttributes.Add(initializeCustomConstructorRef);
-            }
+            }*/
 
             var worker = rwInitializer.Body.GetILProcessor();
 

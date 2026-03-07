@@ -1,18 +1,35 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-  </PropertyGroup>
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net6.0</TargetFramework>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Mono.Cecil" Version="0.11.4" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Mono.Cecil" Version="0.11.4"/>
+       <!-- <PackageReference Include="UnityEngine.Modules" Version="2022.3" IncludeAssets="" />-->
+        <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.3" PrivateAssets="all" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Mirage\Mirage.csproj" />
-    <ProjectReference Include="..\UnityEngine\FakeUnityEngine.csproj" />
-  </ItemGroup>
-
+    <ItemGroup>
+        <Reference Include="Mirage">
+            <HintPath>$(GameManagedDir)\Mirage.dll</HintPath>
+            <Publicize>true</Publicize>
+        </Reference>
+        <Reference Include="UniTask">
+            <HintPath>$(GameManagedDir)\UniTask.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEditor">
+            <HintPath>$(UnityManagedDir)\UnityEditor.dll</HintPath>
+        </Reference>
+        <Reference Include="Unity.CompilationPipeline.Common">
+            <HintPath>$(UnityManagedDir)\..\Unity.CompilationPipeline.Common.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.CoreModule">
+            <HintPath>$(GameManagedDir)\UnityEngine.CoreModule.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+    
+    
 </Project>

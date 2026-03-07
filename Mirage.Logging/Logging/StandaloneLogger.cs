@@ -1,94 +1,105 @@
 using System;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Mirage.Logging
 {
-    public class StandaloneLogger : ILogger
+    public class StandaloneLogger : ILogger, ILogHandler
     {
         public ILogHandler logHandler { get; set; }
-        public bool logEnabled { get; set; }
-        public LogType filterLogType { get; set; }
+        public bool logEnabled { get; set; } = true;
+        public LogType filterLogType { get; set; } = LogType.Log;
 
         public StandaloneLogger()
         {
-            // set initial log handler to be itself
             logHandler = this;
-            filterLogType = LogType.Log;
-            logEnabled = true;
         }
 
         public bool IsLogTypeAllowed(LogType logType)
         {
-            if (!logEnabled) { return false; }
-            if (logType == LogType.Exception) { return true; }
-            if (filterLogType == LogType.Exception) { return false; }
-
-            // if check type is less than logger type
-            // eg check error <= warning === true
-            return (logType <= filterLogType);
+            if (!logEnabled) return false;
+            if (logType == LogType.Exception) return true;
+            if (filterLogType == LogType.Exception) return false;
+            return logType <= filterLogType;
         }
 
-        public void Log(LogType type, object message)
-        {
-            logHandler.LogFormat(type, null, message.ToString());
-        }
+        #region ILogger Implementation
 
-        public void Log(object message)
-        {
-            logHandler.LogFormat(LogType.Log, null, message.ToString());
-        }
+        public void Log(LogType logType, object message) => Log(logType, message, null);
 
-        public void LogWarning(object message)
-        {
-            logHandler.LogFormat(LogType.Warning, null, message.ToString());
-        }
-
-        public void LogError(object message)
-        {
-            logHandler.LogFormat(LogType.Error, null, message.ToString());
-        }
-
-        public void LogException(Exception ex)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-
-            Console.WriteLine(ex.Message);
-        }
-
-        #region Implementation of ILogHandler
-        ConsoleColor[] logTypeToColor = new ConsoleColor[] {
-            ConsoleColor.Red,
-            ConsoleColor.Red,
-            ConsoleColor.Yellow,
-            ConsoleColor.White,
-            ConsoleColor.Red,
-        };
-
-
-        public void LogFormat(LogType logType, UnityEngine.Object context, string format, params object[] args)
+        public void Log(LogType logType, object message, Object context)
         {
             if (IsLogTypeAllowed(logType))
-            {
-                Console.ForegroundColor = logTypeToColor[(int)logType];
-
-                // only use format if there are args
-                string msg = (args != null && args.Length > 0)
-                    ? string.Format(format, args)
-                    : format;
-
-                Console.WriteLine(msg);
-                Console.ResetColor();
-            }
+                logHandler.LogFormat(logType, context, "{0}", message);
         }
 
-        public void LogException(Exception exception, UnityEngine.Object context)
+        public void Log(LogType logType, string tag, object message) => Log(logType, tag, message, null);
+
+        public void Log(LogType logType, string tag, object message, Object context)
         {
-            if (logEnabled)
-            {
-                Console.ForegroundColor = logTypeToColor[(int)LogType.Exception];
-                Console.WriteLine(exception);
-                Console.ResetColor();
-            }
+            if (IsLogTypeAllowed(logType))
+                logHandler.LogFormat(logType, context, "[{0}] {1}", tag, message);
+        }
+
+        public void Log(object message) => Log(LogType.Log, message);
+
+        public void Log(string tag, object message) => Log(LogType.Log, tag, message);
+
+        public void Log(string tag, object message, Object context) => Log(LogType.Log, tag, message, context);
+
+        public void LogWarning(string tag, object message) => Log(LogType.Warning, tag, message);
+
+        public void LogWarning(string tag, object message, Object context) => Log(LogType.Warning, tag, message, context);
+
+        public void LogError(string tag, object message) => Log(LogType.Error, tag, message);
+
+        public void LogError(string tag, object message, Object context) => Log(LogType.Error, tag, message, context);
+
+        public void LogException(Exception exception) => LogException(exception, null);
+
+        void ILogger.LogFormat(LogType logType, string format, params object[] args)
+        {
+            logHandler.LogFormat(logType, null, format, args);
+        }
+
+        public void LogWarning(object message) => Log(LogType.Warning, message);
+        public void LogError(object message) => Log(LogType.Error, message);
+
+        #endregion
+
+        #region ILogHandler Implementation
+
+        private static readonly ConsoleColor[] logTypeToColor = {
+            ConsoleColor.Red,    // Error
+            ConsoleColor.Red,    // Assert
+            ConsoleColor.Yellow, // Warning
+            ConsoleColor.White,  // Log
+            ConsoleColor.Cyan,   // Exception (Changed to Cyan to distinguish from Error)
+        };
+
+        public void LogFormat(LogType logType, Object context, string format, params object[] args)
+        {
+            if (!IsLogTypeAllowed(logType)) return;
+
+            Console.ForegroundColor = logTypeToColor[(int)logType];
+            
+            string message = (args != null && args.Length > 0) ? string.Format(format, args) : format;
+
+            string contextPart = context != null ? $"({context.name}) " : "";
+
+            Console.WriteLine($"{contextPart}{message}");
+            Console.ResetColor();
+        }
+
+        public void LogException(Exception exception, Object context)
+        {
+            if (!logEnabled) return;
+
+            Console.ForegroundColor = ConsoleColor.Red;
+            string contextPart = context != null ? $" [Context: {context.name}]" : "";
+            Console.WriteLine($"Exception: {exception.Message}{contextPart}");
+            Console.WriteLine(exception.StackTrace);
+            Console.ResetColor();
         }
 
         #endregion

@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\UnityEngine\FakeUnityEngine.csproj" />
+      <PackageReference Include="UnityEngine.Modules" Version="2022.3" IncludeAssets="compile" />
   </ItemGroup>
 
 </Project>

@@ -59,6 +59,11 @@ namespace Mirage.Weaver
 
         public void RegisterCollectionMethod(TypeDefinition dataType, MethodReference methodReference)
         {
+            if (dataType == null) {
+                Console.WriteLine($"[Weaver Error] Method {methodReference.FullName} has a NULL parameter type! Skipping...");
+                return;
+            }
+
             if (collectionMethods.ContainsKey(dataType))
             {
                 logger.Warning(
@@ -233,7 +238,7 @@ namespace Mirage.Weaver
                 throw ThrowCantGenerate(typeReference, "abstract class");
             }
 
-            // generate writer for class/struct 
+            // generate writer for class/struct
             var generated = GenerateClassOrStructFunction(typeReference);
             //MarkAsGenerated(typeDefinition); < ---broken in unity2021
 

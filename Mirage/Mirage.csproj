@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -10,8 +10,8 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <PackageProjectUrl></PackageProjectUrl>
     <RepositoryUrl>https://github.com/MirageNet/MirageStandalone</RepositoryUrl>
-    <AssemblyVersion>146.2.1</AssemblyVersion> <!-- Mirage version -->
-    <Version>146.2.1</Version> <!-- package version -->
+    <AssemblyVersion>149.4.1</AssemblyVersion> <!-- Mirage version -->
+    <Version>149.4.1</Version> <!-- package version -->
     <PackageId>MirageNet.$(AssemblyName)</PackageId>
     <Title>$(AssemblyName)</Title>
     <PackageReadmeFile>README.md</PackageReadmeFile>

@@ -12,6 +12,7 @@ namespace Mirage.Sockets.Udp
         public static void Init() => throw new NotSupportedException();
         public static void Deinit() => throw new NotSupportedException();
     }
+
     public sealed class NanoSocket : ISocket
     {
         public static bool Supported => false;
@@ -19,11 +20,30 @@ namespace Mirage.Sockets.Udp
         public NanoSocket(UdpSocketFactory factory) => throw new NotSupportedException();
         public void Bind(IEndPoint endPoint) => throw new NotSupportedException();
         public void Connect(IEndPoint endPoint) => throw new NotSupportedException();
+
+        public void Bind(IBindEndPoint endPoint) => throw new NotSupportedException();
+
+        public IConnectionHandle Connect(IConnectEndPoint endPoint) => throw new NotSupportedException();
+
         public void Close() => throw new NotSupportedException();
+
+        public void SetTickEvents(int maxPacketSize, OnData onData, OnDisconnect onDisconnect) => throw new NotSupportedException();
+
+        public void Tick() => throw new NotSupportedException();
+
+        public void Flush() => throw new NotSupportedException();
+
         public bool Poll() => throw new NotSupportedException();
+
+        public int Receive(Span<byte> outBuffer, out IConnectionHandle handle) => throw new NotSupportedException();
+
+        public void Send(IConnectionHandle handle, ReadOnlySpan<byte> packet) => throw new NotSupportedException();
+
         public int Receive(byte[] buffer, out IEndPoint endPoint) => throw new NotSupportedException();
+
         public void Send(IEndPoint endPoint, byte[] packet, int length) => throw new NotSupportedException();
     }
+
     public sealed class NanoEndPoint : IEndPoint
     {
         public NanoEndPoint(string host, ushort port) => throw new NotSupportedException();
