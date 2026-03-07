@@ -9,7 +9,7 @@ Mirage is a rolling-release high-level API for the Unity Game Engine that provid
 
 ## Install
 
-Either add source code to your project, or add the [nuget package](https://www.nuget.org/packages/MirageNet.Mirage/)
+Either add source code to your project, ~~or add the nuget package~~
 
 ## Adding Weaver to project
 
@@ -37,18 +37,18 @@ or add this when working with the nuget package
 
 It will cause weaver to run when that project is compiled and stop if weaver has any errors
 
-## Create package
+## ~~Create package~~
 
 ```sh
 sh Pack.sh
 ```
 
-## How to update this repo
+## ~~How to update this repo~~
 
 Run copy script
 ```sh
 CopyFromMirage.sh "<path to mirage repo>"
 ```
 
-This script will delete all old scripts and copy new scripts into the correct folders in this repo. 
-The files should then be double checked before committing and pushing.
+~~This script will delete all old scripts and copy new scripts into the correct folders in this repo. 
+The files should then be double checked before committing and pushing.~~
