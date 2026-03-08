@@ -12,48 +12,61 @@ namespace Mirage.Weaver
 {
     internal class Program
     {
+        private static string _gameDir;
+
+        static Program()
+        {
+            AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
+            {
+                if (string.IsNullOrEmpty(_gameDir)) return null;
+
+                string assemblyName = new AssemblyName(args.Name).Name;
+                string assemblyPath = Path.Combine(_gameDir, assemblyName + ".dll");
+
+                if (File.Exists(assemblyPath))
+                {
+                    return Assembly.LoadFrom(assemblyPath);
+                }
+
+                return null;
+            };
+        }
+
         private static void Main(string[] args)
         {
             try
             {
                 Console.WriteLine("Mirage Weaver start");
 
-                if (args.Length == 0)
+                if (args.Length < 2)
                 {
-                    Console.Error.WriteLine("ERROR: Mirage CodeGen cannot be run without any arguments!");
-                    Console.WriteLine("Usage: Mirage.CodeGen.exe <path to target DLL> [additional search paths...]");
+                    Console.Error.WriteLine("ERROR: Not enough arguments!");
+                    Console.WriteLine("Usage: Mirage.CodeGen.exe <target DLL> <game Managed dir>");
                     Environment.Exit(1);
                 }
 
                 var dllPath = Path.GetFullPath(args[0]);
+                _gameDir = Path.GetFullPath(args[1]);
 
-                // 1. Setup the search directories for the Assembly Resolver
-                // This is crucial for resolving Span<T>, int[], etc.
-                var searchDirs = new HashSet<string> { Path.GetDirectoryName(dllPath) };
-                for (int i = 1; i < args.Length; i++)
+                if (!Directory.Exists(_gameDir))
                 {
-                    if (Directory.Exists(args[i]))
-                    {
-                        searchDirs.Add(Path.GetFullPath(args[i]));
-                        Console.WriteLine($"[Resolver] Added search path: {args[i]}");
-                    }
+                    Console.Error.WriteLine($"ERROR: Game directory does not exist: {_gameDir}");
+                    Environment.Exit(1);
                 }
 
-                // 2. Create the Resolver
+                Console.WriteLine($"[Resolver] Game directory set to: {_gameDir}");
+
+                var searchDirs = new[] { Path.GetDirectoryName(dllPath), _gameDir };
                 var resolver = new DefaultAssemblyResolver();
                 foreach (var dir in searchDirs)
                 {
                     resolver.AddSearchDirectory(dir);
                 }
 
-                // 3. Create the CompiledAssembly with the Resolver
-                // We pass searchDirs to gather the string[] References the weaver likes to scan
-                var compiledAssembly = new CompiledAssembly(dllPath, searchDirs.ToArray(), resolver);
-
+                var compiledAssembly = new CompiledAssembly(dllPath, searchDirs, resolver);
                 var weaverLogger = new WeaverLogger(false);
                 var weaver = new Weaver(weaverLogger);
 
-                // Weaver.Process will now have access to the Resolver via the compiledAssembly object
                 var result = weaver.Process(compiledAssembly);
 
                 Write(result, dllPath, compiledAssembly.PdbPath);
@@ -107,7 +120,6 @@ namespace Mirage.Weaver
 
     public class CompiledAssembly : ICompiledAssembly
     {
-        // Property expected by the Weaver to resolve dependencies
         public IAssemblyResolver Resolver { get; }
 
         public CompiledAssembly(string dllPath, string[] searchDirs, IAssemblyResolver resolver)
@@ -121,8 +133,8 @@ namespace Mirage.Weaver
 
             InMemoryAssembly = new InMemoryAssembly(peData, pdbData);
 
-            // Gather all DLLs in our search paths to act as References
             References = searchDirs
+                .Where(Directory.Exists)
                 .SelectMany(dir => Directory.GetFiles(dir, "*.dll"))
                 .ToArray();
 
